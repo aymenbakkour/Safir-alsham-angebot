@@ -1,174 +1,252 @@
-// عناصر الواجهة
-const categorySelect = document.getElementById("categorySelect");
-const productSelect = document.getElementById("productSelect");
-const qtyInput = document.getElementById("qtyInput");
+// app.js
+// يعتمد على متغير `products` الموجود في products.js
 
-const addBtn = document.getElementById("addBtn");
-const clearBtn = document.getElementById("clearBtn");
-const downloadBtn = document.getElementById("downloadBtn");
+// ------- عناصر DOM -------
+const productSearch = document.getElementById("productSearch");
+const productsArea = document.getElementById("productsArea");
 
-const offerTitleInput = document.getElementById("offerTitle");
-const deliveryCostInput = document.getElementById("deliveryCost");
-const transferCostInput = document.getElementById("transferCost");
+const offerTitle = document.getElementById("offerTitle");
+const deliveryCost = document.getElementById("deliveryCost");
+const transferCost = document.getElementById("transferCost");
 
-const previewDiv = document.getElementById("preview");
+const generateSpecialOfferBtn = document.getElementById("generateSpecialOfferBtn");
+const clearPreviewBtn = document.getElementById("clearPreviewBtn");
 
-// مصفوفة المنتجات المختارة
-let offerItems = [];
+const preview = document.getElementById("preview");
+const downloadBtn = document.getElementById("downloadImageBtn");
 
-// تحميل المنتجات حسب الفئة
-function loadProductsForCategory() {
-    productSelect.innerHTML = "";
+// ------- حالة التطبيق -------
+let offerItems = [];      // عناصر العرض الحالية: { name, price, qty, total }
+let searchTerm = "";
+let openCategories = {};  // لتتبع حالة الفئات (مفتوحة/مطوية)
 
-    const category = categorySelect.value;
-    if (!products[category]) return;
-
-    products[category].forEach(prod => {
-        const opt = document.createElement("option");
-        opt.value = prod.name;
-        opt.textContent = `${prod.name} - ${prod.price}€`;
-        opt.dataset.price = prod.price;
-        productSelect.appendChild(opt);
-    });
+// ------ مسافة آمنة لزر التنزيل (في حال لم يضبطها CSS) -------
+if (downloadBtn) {
+  downloadBtn.style.marginTop = downloadBtn.style.marginTop || "12px";
 }
 
-// تحديث المعاينة فورًا عند التعديل
-offerTitleInput.addEventListener("input", updatePreview);
-deliveryCostInput.addEventListener("input", updatePreview);
-transferCostInput.addEventListener("input", updatePreview);
+// ------- تجميع المنتجات حسب الفئة -------
+function groupProducts() {
+  const grouped = {};
+  (products || []).forEach(p => {
+    if (searchTerm && !p.name.includes(searchTerm)) return;
+    if (!grouped[p.category]) grouped[p.category] = [];
+    grouped[p.category].push(p);
+  });
+  return grouped;
+}
 
-// زر إضافة منتج للمعاينة
-addBtn.addEventListener("click", () => {
-    const name = productSelect.value;
-    const price = parseFloat(productSelect.selectedOptions[0].dataset.price);
-    const qty = parseFloat(qtyInput.value) || 1;
+// ------- عرض المنتجات (مطوية حسب الفئة) -------
+function renderProducts() {
+  productsArea.innerHTML = "";
+  const grouped = groupProducts();
+  const categories = Object.keys(grouped);
 
-    if (!name || price <= 0 || qty <= 0) return;
+  if (categories.length === 0) {
+    productsArea.innerHTML = `<p class="text-gray-500">لا توجد منتجات.</p>`;
+    return;
+  }
 
-    const total = price * qty;
-
-    offerItems.push({
-        name,
-        price,
-        qty,
-        total
+  categories.forEach(cat => {
+    // رأس الفئة
+    const catHeader = document.createElement("div");
+    catHeader.className = "category-header";
+    catHeader.innerHTML = `<span>${cat}</span><span>▾</span>`;
+    catHeader.addEventListener("click", () => {
+      openCategories[cat] = !openCategories[cat];
+      renderProducts();
     });
+    productsArea.appendChild(catHeader);
 
-    updatePreview();
-});
-
-// زر تفريغ العرض بالكامل
-clearBtn.addEventListener("click", () => {
-    offerItems = [];
-    offerTitleInput.value = "";
-    deliveryCostInput.value = "";
-    transferCostInput.value = "";
-    updatePreview();
-});
-
-// دالة تحديث المعاينة
-function updatePreview() {
-    previewDiv.innerHTML = "";
-
-    // عنوان العرض
-    const title = offerTitleInput.value.trim();
-    if (title) {
-        const h2 = document.createElement("h2");
-        h2.textContent = title;
-        h2.style.marginBottom = "15px";
-        previewDiv.appendChild(h2);
-    }
-
-    // المنتجات
-    offerItems.forEach((item, index) => {
+    // محتوى الفئة (مطوي افتراضياً)
+    if (openCategories[cat]) {
+      grouped[cat].forEach(p => {
         const row = document.createElement("div");
-        row.className = "preview-item";
-
-        const nameSpan = document.createElement("span");
-        nameSpan.className = "item-name";
-        nameSpan.textContent = `${item.name} (${item.qty})`;
-
-        const priceSpan = document.createElement("span");
-        priceSpan.className = "item-price";
-        priceSpan.textContent = item.total.toFixed(2) + " €";
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "✕";
-        deleteBtn.className = "delete-item-btn";
-        deleteBtn.onclick = () => {
-            offerItems.splice(index, 1);
-            updatePreview();
-        };
-
-        row.appendChild(nameSpan);
-        row.appendChild(priceSpan);
-        row.appendChild(deleteBtn);
-        previewDiv.appendChild(row);
-    });
-
-    // تكاليف إضافية
-    const delivery = parseFloat(deliveryCostInput.value) || 0;
-    const transfer = parseFloat(transferCostInput.value) || 0;
-
-    if (delivery > 0) {
-        const d = document.createElement("div");
-        d.className = "cost-row";
-        d.innerHTML = `<strong>تكلفة التوصيل:</strong> ${delivery.toFixed(2)} €`;
-        previewDiv.appendChild(d);
+        row.className = "product-row";
+        row.innerHTML = `
+          <span class="product-name">${p.name}</span>
+          <span class="product-price">${Number(p.price).toFixed(2)} €</span>
+          <button class="add-btn" data-id="${p.id}">+</button>
+        `;
+        // حدث زر الإضافة
+        row.querySelector(".add-btn").addEventListener("click", (e) => {
+          addToOffer(p.id);
+        });
+        productsArea.appendChild(row);
+      });
     }
-
-    if (transfer > 0) {
-        const t = document.createElement("div");
-        t.className = "cost-row";
-        t.innerHTML = `<strong>تكلفة التحويل:</strong> ${transfer.toFixed(2)} €`;
-        previewDiv.appendChild(t);
-    }
-
-    // الإجمالي
-    const total =
-        offerItems.reduce((sum, item) => sum + item.total, 0) +
-        delivery +
-        transfer;
-
-    const totalRow = document.createElement("div");
-    totalRow.className = "total-row";
-    totalRow.innerHTML = `<strong>الإجمالي:</strong> ${total.toFixed(2)} €`;
-    previewDiv.appendChild(totalRow);
+  });
 }
 
-// زر تنزيل الصورة
-downloadBtn.addEventListener("click", () => {
-    if (!offerItems.length) return;
+// ------- إضافة منتج للعرض -------
+function addToOffer(id) {
+  const p = (products || []).find(x => x.id === id);
+  if (!p) return;
+  // إذا أردنا دعم الكميات لاحقًا، يمكن تعديل هنا
+  const item = { name: p.name, price: Number(p.price), qty: 1, total: Number(p.price) };
+  offerItems.push(item);
+  renderOffer();
+}
 
-    const clone = previewDiv.cloneNode(true);
-    clone.querySelectorAll("button").forEach(btn => btn.remove());
+// ------- إزالة عنصر من العرض -------
+function removeFromOffer(index) {
+  if (index < 0 || index >= offerItems.length) return;
+  offerItems.splice(index, 1);
+  renderOffer();
+}
 
-    clone.querySelectorAll(".preview-item").forEach(row => {
-        row.style.backgroundColor = "#ffffff";
-        row.style.padding = "8px";
-        row.style.borderRadius = "5px";
+// ------- حساب الإجمالي -------
+function computeTotals() {
+  const itemsTotal = offerItems.reduce((s, it) => s + (Number(it.total) || 0), 0);
+  const d = parseFloat(deliveryCost.value || 0) || 0;
+  const t = parseFloat(transferCost.value || 0) || 0;
+  const grand = itemsTotal + d + t;
+  return { itemsTotal, delivery: d, transfer: t, grand };
+}
+
+// ------- عرض المعاينة (مباشر) -------
+function renderOffer() {
+  preview.innerHTML = "";
+
+  // عنوان العرض (يظهر حتى لو كان فارغاً كعنوان افتراضي)
+  const titleText = offerTitle.value.trim() || "سفير الشام – عرض";
+  const h = document.createElement("h3");
+  h.textContent = titleText;
+  h.style.marginBottom = "8px";
+  preview.appendChild(h);
+
+  // المنتجات (كل صف: اسم | سعر | زر حذف)
+  if (offerItems.length === 0) {
+    const p = document.createElement("p");
+    p.className = "text-gray-500";
+    p.textContent = "لا توجد منتجات في العرض.";
+    preview.appendChild(p);
+  } else {
+    offerItems.forEach((it, idx) => {
+      const row = document.createElement("div");
+      row.className = "preview-item";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = `${it.name}`; // لو أردت إضافة الكمية: `${it.name} (${it.qty})`
+
+      const priceSpan = document.createElement("span");
+      priceSpan.textContent = `${Number(it.total).toFixed(2)} €`;
+
+      const btn = document.createElement("button");
+      btn.textContent = "حذف";
+      btn.addEventListener("click", () => removeFromOffer(idx));
+
+      row.appendChild(nameSpan);
+      row.appendChild(priceSpan);
+      row.appendChild(btn);
+
+      preview.appendChild(row);
     });
+  }
 
-    clone.style.position = "absolute";
-    clone.style.left = "-9999px";
-    document.body.appendChild(clone);
+  // التكاليف تحت بعضها
+  const totals = computeTotals();
+  const costDiv = document.createElement("div");
+  costDiv.className = "preview-cost";
+  costDiv.innerHTML = `
+    <div>تكلفة التوصيل: ${totals.delivery.toFixed(2)} €</div>
+    <div>تكلفة التحويل: ${totals.transfer.toFixed(2)} €</div>
+  `;
+  preview.appendChild(costDiv);
 
-    html2canvas(clone, { backgroundColor: "#f4f4f4", scale: 2 })
-        .then(canvas => {
-            const link = document.createElement("a");
-            link.download = "offer.png";
-            link.href = canvas.toDataURL("image/png");
-            link.click();
+  // المجموع النهائي بمظهر مختلف وواضح
+  const totalDiv = document.createElement("div");
+  totalDiv.className = "preview-total";
+  totalDiv.textContent = `المجموع النهائي: ${totals.grand.toFixed(2)} €`;
+  preview.appendChild(totalDiv);
 
-            document.body.removeChild(clone);
-        })
-        .catch(err => {
-            console.error("خطأ أثناء تنزيل العرض:", err);
-        });
+  // حالة زر التنزيل
+  downloadBtn.disabled = offerItems.length === 0;
+}
+
+// ------- تنزيل المعاينة كصورة بدون أزرار حذف -------
+function downloadPreviewAsImage() {
+  if (offerItems.length === 0) return;
+
+  // استنساخ المعاينة
+  const clone = preview.cloneNode(true);
+
+  // إزالة كل الأزرار التفاعلية من النسخة
+  clone.querySelectorAll("button").forEach(b => b.remove());
+
+  // ضع تنسيقات بسيطة لضمان صورة مرتبة
+  clone.querySelectorAll(".preview-item").forEach(row => {
+    row.style.backgroundColor = "#ffffff";
+    row.style.padding = "8px";
+    row.style.borderRadius = "6px";
+    row.style.marginBottom = "6px";
+  });
+  clone.style.backgroundColor = "#ffffff";
+  clone.style.padding = "12px";
+  clone.style.border = "1px solid #e6eefc";
+
+  // نضع النسخة خارج الشاشة قبل التقاطها
+  clone.style.position = "absolute";
+  clone.style.left = "-9999px";
+  document.body.appendChild(clone);
+
+  // التقاط الصورة بجودة أعلى
+  html2canvas(clone, { backgroundColor: "#ffffff", scale: 2 }).then(canvas => {
+    const a = document.createElement("a");
+    a.download = "offer.png";
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+    // إزالة النسخة المؤقتة
+    document.body.removeChild(clone);
+  }).catch(err => {
+    console.error("خطأ أثناء إنشاء صورة العرض:", err);
+    if (clone.parentNode) clone.parentNode.removeChild(clone);
+  });
+}
+
+// ------- الأحداث -------
+
+// البحث النصي
+productSearch.addEventListener("input", () => {
+  searchTerm = productSearch.value.trim();
+  renderProducts();
 });
 
-// تحميل المنتجات عند تغيير الفئة
-categorySelect.addEventListener("change", loadProductsForCategory);
+// تحديث المعاينة فورًا عند تعديل الحقول
+offerTitle.addEventListener("input", renderOffer);
+deliveryCost.addEventListener("input", renderOffer);
+transferCost.addEventListener("input", renderOffer);
 
-// تحميل المنتجات عند بدء التشغيل
-loadProductsForCategory();
+// أزرار الإنشاء / التفريغ / تنزيل
+generateSpecialOfferBtn.addEventListener("click", () => {
+  // مثال: نملأ العرض بعناصر محددة (يمكنك تعديل القائمة لتناسب احتياجك)
+  offerItems = [
+    { name: "٥ كغ سكر", price: 3.75, qty: 1, total: 3.75 },
+    { name: "٥ كغ رز مصري", price: 5.00, qty: 1, total: 5.00 },
+    { name: "٥ كغ رز تايلندي", price: 5.00, qty: 1, total: 5.00 },
+    { name: "٢ كغ دبس بندورة", price: 3.00, qty: 1, total: 3.00 },
+    { name: "٢ كغ سمنة كلارنا", price: 5.85, qty: 1, total: 5.85 },
+    { name: "٤ لتر زيت دوار الشمس", price: 8.35, qty: 1, total: 8.35 },
+    { name: "٢ كغ برغل خشن", price: 1.70, qty: 1, total: 1.70 },
+    { name: "٤٥٠ غ شاي سيدي هشام", price: 5.50, qty: 1, total: 5.50 },
+    { name: "٥٠٠ غ بن الحموي هال اكسترا", price: 8.50, qty: 1, total: 8.50 },
+    { name: "٥ قوالب ماجي", price: 1.00, qty: 1, total: 1.00 },
+    { name: "٢ كغ فخاد فروج", price: 5.00, qty: 1, total: 5.00 },
+    { name: "١ كغ لحمة عجل هبرة", price: 12.00, qty: 1, total: 12.00 }
+  ];
+  renderOffer();
+});
+
+clearPreviewBtn.addEventListener("click", () => {
+  offerItems = [];
+  offerTitle.value = "";
+  deliveryCost.value = "";
+  transferCost.value = "";
+  renderOffer();
+});
+
+downloadBtn.addEventListener("click", downloadPreviewAsImage);
+
+// ------- تهيئة أولية -------
+renderProducts();
+renderOffer();
