@@ -1,155 +1,174 @@
-// VARIABLES
+// عناصر الواجهة
+const categorySelect = document.getElementById("categorySelect");
+const productSelect = document.getElementById("productSelect");
+const qtyInput = document.getElementById("qtyInput");
+
+const addBtn = document.getElementById("addBtn");
+const clearBtn = document.getElementById("clearBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+
+const offerTitleInput = document.getElementById("offerTitle");
+const deliveryCostInput = document.getElementById("deliveryCost");
+const transferCostInput = document.getElementById("transferCost");
+
+const previewDiv = document.getElementById("preview");
+
+// مصفوفة المنتجات المختارة
 let offerItems = [];
-let searchTerm = "";
-let openCategories = {};
 
-const productsArea = document.getElementById("productsArea");
-const preview = document.getElementById("preview");
-const productSearch = document.getElementById("productSearch");
-const offerTitle = document.getElementById("offerTitle");
-const deliveryCost = document.getElementById("deliveryCost");
-const transferCost = document.getElementById("transferCost");
-const downloadBtn = document.getElementById("downloadImageBtn");
+// تحميل المنتجات حسب الفئة
+function loadProductsForCategory() {
+    productSelect.innerHTML = "";
 
+    const category = categorySelect.value;
+    if (!products[category]) return;
 
-/* RENDER PRODUCTS */
-function renderProducts() {
-    productsArea.innerHTML = "";
-    let groups = {};
-
-    products.forEach(p => {
-        if (searchTerm && !p.name.includes(searchTerm)) return;
-        if (!groups[p.category]) groups[p.category] = [];
-        groups[p.category].push(p);
-    });
-
-    Object.keys(groups).forEach(cat => {
-        const head = document.createElement("div");
-        head.className = "category-header";
-        head.innerHTML = `<span>${cat}</span><span>▼</span>`;
-        head.onclick = () => {
-            openCategories[cat] = !openCategories[cat];
-            renderProducts();
-        };
-        productsArea.appendChild(head);
-
-        if (openCategories[cat]) {
-            groups[cat].forEach(p => {
-                const row = document.createElement("div");
-                row.className = "product-row";
-
-                row.innerHTML = `
-                    <span>${p.name}</span>
-                    <span>${p.price.toFixed(2)} €</span>
-                    <button class="add-btn" onclick="addToOffer('${p.id}')">+</button>
-                `;
-                productsArea.appendChild(row);
-            });
-        }
+    products[category].forEach(prod => {
+        const opt = document.createElement("option");
+        opt.value = prod.name;
+        opt.textContent = `${prod.name} - ${prod.price}€`;
+        opt.dataset.price = prod.price;
+        productSelect.appendChild(opt);
     });
 }
 
+// تحديث المعاينة فورًا عند التعديل
+offerTitleInput.addEventListener("input", updatePreview);
+deliveryCostInput.addEventListener("input", updatePreview);
+transferCostInput.addEventListener("input", updatePreview);
 
-/* ADD PRODUCTS */
-function addToOffer(id) {
-    const product = products.find(p => p.id === id);
-    offerItems.push({...product});
-    renderOffer();
-}
+// زر إضافة منتج للمعاينة
+addBtn.addEventListener("click", () => {
+    const name = productSelect.value;
+    const price = parseFloat(productSelect.selectedOptions[0].dataset.price);
+    const qty = parseFloat(qtyInput.value) || 1;
 
+    if (!name || price <= 0 || qty <= 0) return;
 
-/* REMOVE PRODUCT */
-function removeItem(index) {
-    offerItems.splice(index, 1);
-    renderOffer();
-}
+    const total = price * qty;
 
+    offerItems.push({
+        name,
+        price,
+        qty,
+        total
+    });
 
-/* RENDER OFFER */
-function renderOffer() {
-    preview.innerHTML = "";
+    updatePreview();
+});
 
-    if (!offerItems.length) {
-        preview.innerHTML = "<p>لا توجد منتجات.</p>";
-        downloadBtn.disabled = true;
-        return;
+// زر تفريغ العرض بالكامل
+clearBtn.addEventListener("click", () => {
+    offerItems = [];
+    offerTitleInput.value = "";
+    deliveryCostInput.value = "";
+    transferCostInput.value = "";
+    updatePreview();
+});
+
+// دالة تحديث المعاينة
+function updatePreview() {
+    previewDiv.innerHTML = "";
+
+    // عنوان العرض
+    const title = offerTitleInput.value.trim();
+    if (title) {
+        const h2 = document.createElement("h2");
+        h2.textContent = title;
+        h2.style.marginBottom = "15px";
+        previewDiv.appendChild(h2);
     }
 
-    preview.innerHTML += `<h3>سفير الشام – ${offerTitle.value || ""}</h3>`;
-
+    // المنتجات
     offerItems.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.className = "preview-item";
-        div.innerHTML = `
-            <span>${item.name}</span>
-            <span>${item.price.toFixed(2)} €</span>
-            <button onclick="removeItem(${index})">حذف</button>
-        `;
-        preview.appendChild(div);
+        const row = document.createElement("div");
+        row.className = "preview-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "item-name";
+        nameSpan.textContent = `${item.name} (${item.qty})`;
+
+        const priceSpan = document.createElement("span");
+        priceSpan.className = "item-price";
+        priceSpan.textContent = item.total.toFixed(2) + " €";
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "✕";
+        deleteBtn.className = "delete-item-btn";
+        deleteBtn.onclick = () => {
+            offerItems.splice(index, 1);
+            updatePreview();
+        };
+
+        row.appendChild(nameSpan);
+        row.appendChild(priceSpan);
+        row.appendChild(deleteBtn);
+        previewDiv.appendChild(row);
     });
 
-    let d = parseFloat(deliveryCost.value || 0);
-    let t = parseFloat(transferCost.value || 0);
+    // تكاليف إضافية
+    const delivery = parseFloat(deliveryCostInput.value) || 0;
+    const transfer = parseFloat(transferCostInput.value) || 0;
 
-    preview.innerHTML += `
-        <div class="preview-cost">
-            <span>تكلفة التوصيل: ${d.toFixed(2)} €</span>
-            <span>تكلفة التحويل: ${t.toFixed(2)} €</span>
-        </div>
-    `;
+    if (delivery > 0) {
+        const d = document.createElement("div");
+        d.className = "cost-row";
+        d.innerHTML = `<strong>تكلفة التوصيل:</strong> ${delivery.toFixed(2)} €`;
+        previewDiv.appendChild(d);
+    }
 
-    const total = offerItems.reduce((s, i) => s + i.price, 0) + d + t;
+    if (transfer > 0) {
+        const t = document.createElement("div");
+        t.className = "cost-row";
+        t.innerHTML = `<strong>تكلفة التحويل:</strong> ${transfer.toFixed(2)} €`;
+        previewDiv.appendChild(t);
+    }
 
-    preview.innerHTML += `
-        <div class="preview-total">
-            المجموع النهائي: ${total.toFixed(2)} €
-        </div>
-    `;
+    // الإجمالي
+    const total =
+        offerItems.reduce((sum, item) => sum + item.total, 0) +
+        delivery +
+        transfer;
 
-    downloadBtn.disabled = false;
+    const totalRow = document.createElement("div");
+    totalRow.className = "total-row";
+    totalRow.innerHTML = `<strong>الإجمالي:</strong> ${total.toFixed(2)} €`;
+    previewDiv.appendChild(totalRow);
 }
 
+// زر تنزيل الصورة
+downloadBtn.addEventListener("click", () => {
+    if (!offerItems.length) return;
 
-/* SPECIAL OFFER */
-document.getElementById("generateSpecialOfferBtn").onclick = () => {
-    offerItems = [...products];
-    renderOffer();
-};
-
-
-/* CLEAR */
-document.getElementById("clearPreviewBtn").onclick = () => {
-    offerItems = [];
-    renderOffer();
-};
-
-
-/* DOWNLOAD AS IMAGE */
-downloadBtn.onclick = () => {
-    const clone = preview.cloneNode(true);
+    const clone = previewDiv.cloneNode(true);
     clone.querySelectorAll("button").forEach(btn => btn.remove());
+
+    clone.querySelectorAll(".preview-item").forEach(row => {
+        row.style.backgroundColor = "#ffffff";
+        row.style.padding = "8px";
+        row.style.borderRadius = "5px";
+    });
+
     clone.style.position = "absolute";
     clone.style.left = "-9999px";
-
     document.body.appendChild(clone);
 
-    html2canvas(clone, { backgroundColor: "#fff", scale: 2 }).then(canvas => {
-        const a = document.createElement("a");
-        a.download = "offer.png";
-        a.href = canvas.toDataURL();
-        a.click();
-        clone.remove();
-    });
-};
+    html2canvas(clone, { backgroundColor: "#f4f4f4", scale: 2 })
+        .then(canvas => {
+            const link = document.createElement("a");
+            link.download = "offer.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
 
+            document.body.removeChild(clone);
+        })
+        .catch(err => {
+            console.error("خطأ أثناء تنزيل العرض:", err);
+        });
+});
 
-/* SEARCH */
-productSearch.oninput = () => {
-    searchTerm = productSearch.value.trim();
-    renderProducts();
-};
+// تحميل المنتجات عند تغيير الفئة
+categorySelect.addEventListener("change", loadProductsForCategory);
 
-
-/* INIT */
-renderProducts();
-renderOffer();
+// تحميل المنتجات عند بدء التشغيل
+loadProductsForCategory();
