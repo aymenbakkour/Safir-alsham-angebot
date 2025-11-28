@@ -1,39 +1,65 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <title>سفير الشام – إنشاء عرض</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>سفير الشام – إنشاء العرض</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              primary: '#2563eb',
-              secondary: '#4f46e5',
-              danger: '#dc2626',
-            }
-          }
-        }
-      }
-    </script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
     <!-- HTML2CANVAS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/"
-  }
-}
-</script>
+
 </head>
-<body class="bg-gray-100 font-sans antialiased text-right">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+<body>
+
+<div class="container">
+
+    <h2 class="title">سفير الشام – إنشاء العرض</h2>
+
+    <!-- البحث -->
+    <div class="section">
+        <input id="productSearch" class="form-control" placeholder="بحث عن منتج…">
+    </div>
+
+    <!-- المنتجات -->
+    <div class="section">
+        <h3 class="section-title">المنتجات</h3>
+        <div id="productsArea"></div>
+    </div>
+
+    <!-- معلومات العرض -->
+    <div class="section">
+        <h3 class="section-title">معلومات العرض</h3>
+
+        <input id="offerTitle" class="form-control mb" placeholder="عنوان العرض">
+
+        <input id="deliveryCost" type="number" class="form-control mb"
+               placeholder="أدخل تكلفة التوصيل" min="0" step="0.01">
+
+        <input id="transferCost" type="number" class="form-control mb"
+               placeholder="أدخل تكلفة التحويل" min="0" step="0.01">
+
+        <button id="generateSpecialOfferBtn" class="btn indigo mb">إنشاء العرض الخاص</button>
+        <button id="clearPreviewBtn" class="btn danger">تفريغ المعاينة</button>
+    </div>
+
+    <!-- العرض -->
+    <div class="section">
+        <h3 class="section-title">معاينة العرض</h3>
+        <div id="preview"></div>
+
+        <button id="downloadImageBtn" class="btn primary mt" disabled>
+            تنزيل العرض كصورة
+        </button>
+    </div>
+
+</div>
+
+<!-- JS FILES -->
+<script src="products.js"></script>
+<script src="app.js"></script>
+
 </body>
 </html>
