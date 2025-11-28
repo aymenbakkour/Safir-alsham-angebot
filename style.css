@@ -1,0 +1,129 @@
+/* GENERAL */
+body {
+    background: #f4f4f4;
+    font-family: Tahoma, sans-serif;
+    margin: 0;
+}
+.container {
+    max-width: 880px;
+    margin: auto;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* SECTIONS */
+.section {
+    background: #fff;
+    padding: 18px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    box-shadow: 0 3px 7px rgba(0,0,0,0.1);
+}
+.section-title {
+    margin-bottom: 15px;
+}
+
+/* INPUTS */
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+.form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 4px rgba(37,99,235,0.4);
+    outline: none;
+}
+
+/* BUTTONS */
+.btn {
+    width: 100%;
+    padding: 13px;
+    border: 0;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+.btn.primary { background: #2563eb; }
+.btn.danger  { background: #dc2626; }
+.btn.indigo  { background: #4f46e5; }
+.btn:hover { opacity: 0.9; }
+
+/* PRODUCTS */
+.category-header {
+    background: #e9ecef;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+}
+.product-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+.add-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #0d6efd;
+    color: white;
+    font-size: 22px;
+    border: 0;
+    cursor: pointer;
+}
+
+/* PREVIEW */
+#preview {
+    border: 2px solid #2563eb;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    min-height: 120px;
+}
+
+.preview-item {
+    display: flex;
+    justify-content: space-between;
+    background: white;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+}
+.preview-item button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+}
+
+.preview-cost {
+    margin-top: 10px;
+    text-align: right;
+    color: #2563eb;
+    display: flex;
+    flex-direction: column;
+}
+
+.preview-total {
+    margin-top: 8px;
+    font-size: 20px;
+    text-align: right;
+    font-weight: bold;
+    color: #dc2626;
+}
