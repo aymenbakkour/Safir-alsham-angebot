@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سفير الشام - النظام المتكامل</title>
+    <title>سفير الشام - القائمة الكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -14,8 +14,6 @@
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .category-pill.active { background: var(--accent); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); border-color: transparent; }
-        
-        /* انميشن الإشعارات */
         @keyframes slideIn { from { transform: translateY(-100%) translateX(50%); opacity: 0; } to { transform: translateY(0) translateX(50%); opacity: 1; } }
         .toast { position: fixed; top: 20px; right: 50%; transform: translateX(50%); z-index: 1000; animation: slideIn 0.3s ease-out; }
     </style>
@@ -24,18 +22,17 @@
 
     <div id="toast-container"></div>
 
-    <header class="p-6 sticky top-0 z-40 glass mb-4 text-center">
+    <header class="p-6 sticky top-0 z-40 glass mb-4 text-center border-b border-white/5">
         <h1 class="text-2xl font-black bg-gradient-to-l from-green-400 to-green-600 bg-clip-text text-transparent">سفير الشام</h1>
-        <p class="text-[10px] text-gray-400 font-bold tracking-widest">توصيل سريع وخدمة متميزة</p>
+        <p class="text-[10px] text-gray-400 font-bold tracking-widest uppercase">القائمة الكاملة للمنتجات</p>
     </header>
 
     <section class="p-4 max-w-lg mx-auto space-y-4">
         <div class="relative">
             <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="بحث عن منتج..." 
+            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="ابحث عن منتج..." 
                 class="w-full p-4 pr-12 rounded-2xl bg-slate-800 outline-none border border-transparent focus:border-green-500/50 transition-all text-white">
         </div>
-
         <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="categories-bar"></div>
     </section>
 
@@ -47,40 +44,33 @@
                 <div class="bg-green-500 w-12 h-12 rounded-2xl flex items-center justify-center text-white text-lg"><i class="fas fa-shopping-basket"></i></div>
                 <div><p class="text-xl font-black text-white" id="total-amount">0.00 €</p></div>
             </div>
-            <button onclick="toggleModal('cart-modal', true)" class="bg-green-600 text-white px-8 py-3 rounded-2xl font-black active:scale-95 transition-transform">مراجعة الطلب</button>
+            <button onclick="toggleModal('cart-modal', true)" class="bg-green-600 text-white px-8 py-3 rounded-2xl font-black active:scale-95 transition-transform">عرض السلة</button>
         </div>
     </div>
 
     <div id="cart-modal" class="fixed inset-0 bg-black/90 z-[60] hidden backdrop-blur-md">
         <div class="absolute bottom-0 left-0 right-0 glass rounded-t-[3rem] p-8 max-h-[90vh] flex flex-col max-w-lg mx-auto border-t border-green-500/20">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black">سلة التسوق</h2>
+                <h2 class="text-2xl font-black">طلباتك</h2>
                 <button onclick="toggleModal('cart-modal', false)" class="text-gray-400 bg-gray-800 w-10 h-10 rounded-full flex items-center justify-center font-bold">✕</button>
             </div>
             <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 no-scrollbar"></div>
             <div class="mt-6 pt-6 border-t border-gray-700 space-y-4 text-center">
                 <p class="text-2xl font-black text-green-500" id="modal-total">0.00 €</p>
-                <button onclick="openCheckout()" class="w-full bg-green-500 py-5 rounded-2xl font-black text-lg shadow-lg shadow-green-500/20">متابعة البيانات</button>
+                <button onclick="openCheckout()" class="w-full bg-green-500 py-5 rounded-2xl font-black text-lg">متابعة الطلب</button>
             </div>
         </div>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 bg-black/95 z-[70] hidden p-4 flex items-center justify-center">
-        <div class="bg-slate-900 w-full max-w-sm rounded-[2.5rem] p-8 border border-gray-700 shadow-2xl">
-            <div class="text-center mb-6">
-                <div class="bg-green-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <i class="fas fa-truck text-green-500 text-2xl"></i>
-                </div>
-                <h3 class="text-xl font-black">بيانات التوصيل</h3>
-            </div>
+        <div class="bg-slate-900 w-full max-w-sm rounded-[2.5rem] p-8 border border-gray-700 shadow-2xl text-center">
+            <h3 class="text-xl font-black mb-6">بيانات التوصيل</h3>
             <div class="space-y-3">
                 <input id="u-name" type="text" placeholder="الاسم الكامل" class="w-full p-4 bg-gray-800 rounded-2xl outline-none text-white border border-transparent focus:border-green-500">
-                <input id="u-phone" type="tel" placeholder="رقم الموبايل" class="w-full p-4 bg-gray-800 rounded-2xl outline-none text-white border border-transparent focus:border-green-500">
-                <textarea id="u-addr" placeholder="العنوان (الشارع، البناء، الشقة)..." class="w-full p-4 bg-gray-800 rounded-2xl outline-none text-white border border-transparent focus:border-green-500 h-24"></textarea>
-                <button id="final-send" onclick="sendToTelegram()" class="w-full bg-green-600 hover:bg-green-500 text-white py-5 rounded-2xl font-black text-lg transition-colors">
-                    إرسال الطلبية
-                </button>
-                <button onclick="toggleModal('checkout-modal', false)" class="w-full text-gray-500 font-bold py-2">رجوع</button>
+                <input id="u-phone" type="tel" placeholder="رقم الهاتف" class="w-full p-4 bg-gray-800 rounded-2xl outline-none text-white border border-transparent focus:border-green-500">
+                <textarea id="u-addr" placeholder="العنوان التفصيلي..." class="w-full p-4 bg-gray-800 rounded-2xl outline-none text-white border border-transparent focus:border-green-500 h-24"></textarea>
+                <button id="final-send" onclick="sendToTelegram()" class="w-full bg-green-600 py-5 rounded-2xl font-black text-lg shadow-lg">إرسال الطلبية</button>
+                <button onclick="toggleModal('checkout-modal', false)" class="w-full text-gray-500 font-bold py-2">إلغاء</button>
             </div>
         </div>
     </div>
@@ -90,26 +80,46 @@
         const CHAT_ID = "1117141728";
 
         const allProducts = [
-            { id: 1, name: "أرز شعلان 5 كغ", price: 18.50, cat: "مواد غذائية" },
-            { id: 2, name: "سكر 5 كغ", price: 6.50, cat: "مواد غذائية" },
-            { id: 3, name: "سمنة سيدي هشام 1 كغ", price: 5.50, cat: "مواد غذائية" },
-            { id: 4, name: "زيت عافية 1.5 لتر", price: 7.20, cat: "مواد غذائية" },
-            { id: 5, name: "برغل خشن 1 كغ", price: 2.50, cat: "مواد غذائية" },
-            { id: 6, name: "عدس أحمر 1 كغ", price: 3.00, cat: "مواد غذائية" },
-            { id: 10, name: "جبنة بلدية", price: 9.00, cat: "ألبان" },
-            { id: 11, name: "لبنة شامية", price: 4.50, cat: "ألبان" },
-            { id: 12, name: "حلاوة طحينية", price: 5.50, cat: "ألبان" },
-            { id: 13, name: "قشطة بلدية", price: 3.50, cat: "ألبان" },
-            { id: 20, name: "أريال 2.5 كغ", price: 11.00, cat: "منظفات" },
-            { id: 21, name: "سائل جلي فيري", price: 2.80, cat: "منظفات" },
-            { id: 30, name: "فول مدمس", price: 1.20, cat: "معلبات" },
-            { id: 32, name: "طحينة 400 غ", price: 4.80, cat: "معلبات" }
+            // قسم البقالة
+            { id: 1, name: "أرز شعلان 5 كغ", price: 18.50, cat: "بقالة" },
+            { id: 2, name: "سكر 5 كغ", price: 6.50, cat: "بقالة" },
+            { id: 3, name: "سمنة سيدي هشام 1 كغ", price: 5.50, cat: "بقالة" },
+            { id: 4, name: "زيت عافية 1.5 لتر", price: 7.20, cat: "بقالة" },
+            { id: 5, name: "برغل خشن/ناعم 1 كغ", price: 2.50, cat: "بقالة" },
+            { id: 6, name: "عدس أحمر 1 كغ", price: 3.00, cat: "بقالة" },
+            { id: 7, name: "حمص حب 1 كغ", price: 2.80, cat: "بقالة" },
+            { id: 8, name: "ملح طعام 1 كغ", price: 0.80, cat: "بقالة" },
+            { id: 9, name: "شاي محمود 500 غ", price: 6.50, cat: "بقالة" },
+            { id: 10, name: "قهوة عربية 250 غ", price: 4.50, cat: "بقالة" },
+            { id: 11, name: "معكرونة (أنواع)", price: 1.20, cat: "بقالة" },
+            
+            // قسم الألبان والأجبان
+            { id: 50, name: "جبنة بلدية (كغ)", price: 9.50, cat: "ألبان" },
+            { id: 51, name: "جبنة قشقوان (كغ)", price: 11.00, cat: "ألبان" },
+            { id: 52, name: "لبنة شامية (كغ)", price: 5.00, cat: "ألبان" },
+            { id: 53, name: "حلاوة طحينية", price: 4.80, cat: "ألبان" },
+            { id: 54, name: "زيتون أخضر/أسود", price: 5.50, cat: "ألبان" },
+            { id: 55, name: "مكدوس سوري", price: 8.50, cat: "ألبان" },
+
+            // قسم المنظفات
+            { id: 100, name: "مسحوق غسيل أريال 5 كغ", price: 14.50, cat: "منظفات" },
+            { id: 101, name: "سائل جلي فيري", price: 2.50, cat: "منظفات" },
+            { id: 102, name: "كلور جيل 1 لتر", price: 1.80, cat: "منظفات" },
+            { id: 103, name: "شامبو (أنواع)", price: 4.50, cat: "منظفات" },
+            { id: 104, name: "صابون يدين سائل", price: 2.20, cat: "منظفات" },
+
+            // قسم المعلبات
+            { id: 150, name: "فول مدمس", price: 1.10, cat: "معلبات" },
+            { id: 151, name: "حمص بالطحينة", price: 1.30, cat: "معلبات" },
+            { id: 152, name: "طحينة 400 غ", price: 4.50, cat: "معلبات" },
+            { id: 153, name: "دبس رمان", price: 3.00, cat: "معلبات" },
+            { id: 154, name: "صلصة طماطم", price: 2.10, cat: "معلبات" },
+            { id: 155, name: "ورق عنب ممتاز", price: 5.50, cat: "معلبات" }
         ];
 
         let cart = [];
         let filteredProducts = [...allProducts];
 
-        // ميزة الإشعارات المنبثقة بدلاً من Alert
         function showToast(msg, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast glass px-6 py-4 rounded-2xl shadow-2xl border-l-4 ${type === 'success' ? 'border-green-500' : 'border-red-500'}`;
@@ -130,8 +140,8 @@
             grid.innerHTML = filteredProducts.map(p => {
                 const item = cart.find(x => x.id === p.id);
                 return `
-                <div class="glass p-5 rounded-[2rem] flex items-center justify-between border border-transparent hover:border-green-500/20 transition-all">
-                    <div>
+                <div class="glass p-5 rounded-[2rem] flex items-center justify-between">
+                    <div class="flex-1">
                         <span class="text-[9px] text-green-500 font-bold uppercase tracking-widest">${p.cat}</span>
                         <h3 class="font-bold text-white text-lg">${p.name}</h3>
                         <p class="text-xl font-black text-white">${p.price.toFixed(2)} €</p>
@@ -161,7 +171,7 @@
         function removeItem(id) {
             cart = cart.filter(x => x.id !== id);
             updateUI();
-            showToast("تم إزالة المنتج من السلة", "error");
+            showToast("تم الحذف من السلة", "error");
         }
 
         function updateUI() {
@@ -182,9 +192,9 @@
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2 bg-black/40 px-2 py-1 rounded-lg">
-                            <button onclick="updateQty(${i.id},-1)" class="text-gray-400 font-black px-1">-</button>
+                            <button onclick="updateQty(${i.id},-1)" class="text-gray-400 px-1 font-bold">-</button>
                             <span class="text-sm font-bold text-white">${i.qty}</span>
-                            <button onclick="updateQty(${i.id},1)" class="text-gray-400 font-black px-1">+</button>
+                            <button onclick="updateQty(${i.id},1)" class="text-gray-400 px-1 font-bold">+</button>
                         </div>
                         <button onclick="removeItem(${i.id})" class="text-red-500 bg-red-500/10 w-10 h-10 rounded-xl"><i class="fas fa-trash-alt"></i></button>
                     </div>
@@ -214,12 +224,11 @@
             const n = document.getElementById('u-name').value;
             const p = document.getElementById('u-phone').value;
             const a = document.getElementById('u-addr').value;
-            
-            if(!n || !p || !a) return showToast("يرجى إكمال كافة البيانات", "error");
+            if(!n || !p || !a) return showToast("يرجى ملء البيانات", "error");
 
-            let msg = `🛒 طلب جديد - سفير الشام\n━━━━━━━━━━━━━━\nالاسم: ${n}\nالهاتف: ${p}\nالعنوان: ${a}\n━━━━━━━━━━━━━━\n`;
-            cart.forEach(i => msg += `• ${i.name} (x${i.qty})\n`);
-            msg += `━━━━━━━━━━━━━━\nالمجموع الكلي: ${document.getElementById('total-amount').innerText}`;
+            let msg = `🛒 طلبية جديدة\n──────────────\n👤 العميل: ${n}\n📞 الهاتف: ${p}\n📍 العنوان: ${a}\n──────────────\n`;
+            cart.forEach(i => msg += `• ${i.name} [x${i.qty}]\n`);
+            msg += `──────────────\n💰 المجموع: ${document.getElementById('total-amount').innerText}`;
 
             const btn = document.getElementById('final-send');
             btn.disabled = true; btn.innerText = "جاري الإرسال...";
@@ -231,12 +240,10 @@
                     body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
                 });
                 if(res.ok) { 
-                    showToast("✅ تم إرسال الطلبية بنجاح!");
+                    showToast("✅ تم إرسال الطلبية بنجاح");
                     setTimeout(() => window.location.reload(), 2000);
-                } else {
-                    showToast("❌ حدث خطأ في الإرسال", "error");
-                }
-            } catch(e) { showToast("🌐 خطأ في الاتصال بالإنترنت", "error"); }
+                } else showToast("❌ فشل الإرسال", "error");
+            } catch(e) { showToast("🌐 خطأ في الاتصال", "error"); }
             finally { btn.disabled = false; btn.innerText = "إرسال الطلبية"; }
         }
 
