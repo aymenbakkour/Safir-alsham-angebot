@@ -3,72 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سفير الشام - النظام الذكي</title>
+    <title>سفير الشام - القائمة الكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap');
-        
-        :root {
-            --bg-dark: #0f172a;
-            --card-dark: #1e293b;
-            --accent: #22c55e;
-        }
-
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background-color: var(--bg-dark); 
-            color: #f1f5f9;
-            touch-action: manipulation; /* تحسين استجابة اللمس ومنع الزووم */
-        }
-
-        /* منع الزووم عند التركيز على الحقول في iOS */
+        :root { --bg-dark: #0f172a; --card-dark: #1e293b; --accent: #22c55e; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-dark); color: #f1f5f9; touch-action: manipulation; }
         input, textarea { font-size: 16px !important; }
-
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
-        .product-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .product-card:active { transform: scale(0.95); }
-        
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .search-gradient {
-            background: linear-gradient(90deg, #1e293b 0%, #334155 100%);
-        }
-
-        .category-pill.active {
-            background: var(--accent);
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-        }
+        .category-pill.active { background: var(--accent); box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); }
     </style>
 </head>
 <body class="pb-32">
 
-    <header class="p-6 sticky top-0 z-40 glass mb-4">
-        <div class="flex justify-between items-center max-w-lg mx-auto">
-            <div>
-                <h1 class="text-2xl font-black bg-gradient-to-l from-green-400 to-green-600 bg-clip-text text-transparent">سفير الشام</h1>
-                <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Smart Order System</p>
-            </div>
-            <div class="relative">
-                <i class="fas fa-bell text-gray-400 text-xl"></i>
-                <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </div>
-        </div>
+    <header class="p-6 sticky top-0 z-40 glass mb-4 text-center">
+        <h1 class="text-2xl font-black bg-gradient-to-l from-green-400 to-green-600 bg-clip-text text-transparent">سفير الشام</h1>
+        <p class="text-[10px] text-gray-400 font-bold tracking-widest">جميع المنتجات من الصورة</p>
     </header>
 
     <section class="p-4 max-w-lg mx-auto space-y-4">
-        <div class="relative group">
-            <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-green-500 transition-colors"></i>
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="ابحث عن منتج..." 
-                class="w-full p-4 pr-12 rounded-2xl search-gradient outline-none border border-transparent focus:border-green-500/50 transition-all">
+        <div class="relative">
+            <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="ابحث في المتجر..." 
+                class="w-full p-4 pr-12 rounded-2xl bg-slate-800 outline-none border border-transparent focus:border-green-500/50 transition-all">
         </div>
 
-        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="categories">
-            <button onclick="filterCat('الكل')" class="category-pill active px-6 py-2 rounded-xl text-sm font-bold whitespace-nowrap border border-gray-700">الكل</button>
-            <button onclick="filterCat('مواد غذائية')" class="category-pill px-6 py-2 rounded-xl text-sm font-bold whitespace-nowrap border border-gray-700">مواد غذائية</button>
-            <button onclick="filterCat('ألبان')" class="category-pill px-6 py-2 rounded-xl text-sm font-bold whitespace-nowrap border border-gray-700">ألبان</button>
-            <button onclick="filterCat('منظفات')" class="category-pill px-6 py-2 rounded-xl text-sm font-bold whitespace-nowrap border border-gray-700">منظفات</button>
-        </div>
+        <div class="flex gap-2 overflow-x-auto no-scrollbar pb-2" id="categories-bar">
+            </div>
     </section>
 
     <main class="p-4 max-w-lg mx-auto grid grid-cols-1 gap-4" id="products-grid"></main>
@@ -76,58 +39,35 @@
     <div id="cart-bar" class="fixed bottom-6 left-4 right-4 max-w-lg mx-auto z-50 transform translate-y-32 transition-transform duration-500">
         <div class="glass p-4 rounded-[2rem] flex justify-between items-center shadow-2xl border border-green-500/30">
             <div class="flex items-center gap-4">
-                <div class="bg-green-500 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg shadow-green-500/20">
-                    <i class="fas fa-shopping-bag text-white"></i>
-                </div>
-                <div>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">إجمالي السلة</p>
-                    <p class="text-xl font-black text-white" id="total-amount">0.00 €</p>
-                </div>
+                <div class="bg-green-500 w-12 h-12 rounded-2xl flex items-center justify-center text-white"><i class="fas fa-shopping-basket"></i></div>
+                <div><p class="text-xl font-black text-white" id="total-amount">0.00 €</p></div>
             </div>
-            <button onclick="toggleModal('cart-modal', true)" class="bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-2xl font-black transition-all active:scale-90">
-                مراجعة
-            </button>
+            <button onclick="toggleModal('cart-modal', true)" class="bg-green-600 text-white px-8 py-3 rounded-2xl font-black active:scale-95">عرض السلة</button>
         </div>
     </div>
 
-    <div id="cart-modal" class="fixed inset-0 bg-black/90 z-[60] hidden backdrop-blur-sm">
+    <div id="cart-modal" class="fixed inset-0 bg-black/90 z-[60] hidden">
         <div class="absolute bottom-0 left-0 right-0 glass rounded-t-[3rem] p-8 max-h-[90vh] flex flex-col max-w-lg mx-auto">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-black">سلة المشتريات</h2>
+                <h2 class="text-2xl font-black">طلباتك</h2>
                 <button onclick="toggleModal('cart-modal', false)" class="text-gray-400 bg-gray-800 w-10 h-10 rounded-full">&times;</button>
             </div>
-            
             <div id="cart-items" class="flex-1 overflow-y-auto space-y-4 no-scrollbar"></div>
-
-            <div class="mt-6 pt-6 border-t border-gray-700 space-y-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-400 font-bold">المجموع النهائي</span>
-                    <span class="text-3xl font-black text-green-500" id="modal-total">0.00 €</span>
-                </div>
-                <button onclick="openCheckout()" class="w-full bg-green-500 py-5 rounded-2xl font-black text-lg shadow-xl shadow-green-500/20">تأكيد الطلب</button>
+            <div class="mt-6 pt-6 border-t border-gray-700 space-y-4 text-center">
+                <p class="text-2xl font-black text-green-500" id="modal-total">0.00 €</p>
+                <button onclick="openCheckout()" class="w-full bg-green-500 py-5 rounded-2xl font-black text-lg">بيانات التوصيل</button>
             </div>
         </div>
     </div>
 
     <div id="checkout-modal" class="fixed inset-0 bg-black/95 z-[70] hidden p-4">
-        <div class="bg-[#1e293b] w-full max-w-sm mx-auto mt-20 rounded-[2.5rem] p-8 border border-gray-700 relative">
-            <div class="text-center mb-8">
-                <div class="bg-green-500/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-map-marked-alt text-green-500 text-3xl"></i>
-                </div>
-                <h3 class="text-xl font-black">أين نسلمك الطلب؟</h3>
-            </div>
-            
-            <div class="space-y-4">
-                <input id="u-name" type="text" placeholder="الاسم الكامل" class="w-full p-4 bg-gray-900/50 rounded-2xl outline-none focus:ring-2 ring-green-500 border-none text-white">
-                <input id="u-phone" type="tel" placeholder="رقم التواصل" class="w-full p-4 bg-gray-900/50 rounded-2xl outline-none focus:ring-2 ring-green-500 border-none text-white">
-                <textarea id="u-addr" placeholder="العنوان بالتفصيل..." class="w-full p-4 bg-gray-900/50 rounded-2xl outline-none focus:ring-2 ring-green-500 border-none text-white h-24"></textarea>
-                
-                <button id="final-send" onclick="sendToTelegram()" class="w-full bg-green-500 text-white py-5 rounded-2xl font-black text-lg">
-                    إرسال الطلب الآن <i class="fab fa-telegram-plane mr-2"></i>
-                </button>
-                <button onclick="toggleModal('checkout-modal', false)" class="w-full text-gray-500 font-bold">تراجع</button>
-            </div>
+        <div class="bg-[#1e293b] w-full max-w-sm mx-auto mt-20 rounded-[2.5rem] p-8 border border-gray-700">
+            <h3 class="text-xl font-black mb-6 text-center">إتمام الطلب</h3>
+            <input id="u-name" type="text" placeholder="الاسم" class="w-full p-4 mb-3 bg-gray-900 rounded-2xl outline-none text-white">
+            <input id="u-phone" type="tel" placeholder="رقم الهاتف" class="w-full p-4 mb-3 bg-gray-900 rounded-2xl outline-none text-white">
+            <textarea id="u-addr" placeholder="العنوان..." class="w-full p-4 mb-6 bg-gray-900 rounded-2xl outline-none text-white h-24"></textarea>
+            <button id="final-send" onclick="sendToTelegram()" class="w-full bg-green-600 py-4 rounded-2xl font-black">إرسال عبر تلغرام</button>
+            <button onclick="toggleModal('checkout-modal', false)" class="w-full text-gray-500 mt-4">إغلاق</button>
         </div>
     </div>
 
@@ -136,48 +76,68 @@
         const CHAT_ID = "1117141728";
 
         const allProducts = [
-            { id: 1, name: "أرز شعلان بنجاب 5 كغ", price: 18.50, cat: "مواد غذائية" },
-            { id: 2, name: "سمنة سيدي هشام 1 كغ", price: 6.50, cat: "مواد غذائية" },
-            { id: 3, name: "زيت زيتون بكر ممتاز 1 لتر", price: 12.00, cat: "مواد غذائية" },
-            { id: 4, name: "جبنة بيضاء بلدية (نابلسية)", price: 8.50, cat: "ألبان" },
-            { id: 5, name: "لبنة شامية إكسترا 500 غ", price: 3.50, cat: "ألبان" },
-            { id: 6, name: "حلاوة طحينية بالفستق", price: 5.00, cat: "مواد غذائية" },
-            { id: 7, name: "برغل ناعم 1 كغ", price: 2.25, cat: "مواد غذائية" },
-            { id: 8, name: "زعتر ملكي أكسترا", price: 4.50, cat: "مواد غذائية" },
-            { id: 9, name: "سائل جلي فيري 1 لتر", price: 3.00, cat: "منظفات" },
-            { id: 10, name: "مسحوق غسيل أريال 2.5 كغ", price: 11.00, cat: "منظفات" }
+            // المواد الغذائية
+            { id: 1, name: "أرز شعلان 5 كغ", price: 18.50, cat: "مواد غذائية" },
+            { id: 2, name: "سكر 5 كغ", price: 6.50, cat: "مواد غذائية" },
+            { id: 3, name: "سمنة سيدي هشام 1 كغ", price: 5.50, cat: "مواد غذائية" },
+            { id: 4, name: "زيت عافية 1.5 لتر", price: 7.20, cat: "مواد غذائية" },
+            { id: 5, name: "برغل خشن 1 كغ", price: 2.50, cat: "مواد غذائية" },
+            { id: 6, name: "عدس أحمر 1 كغ", price: 3.00, cat: "مواد غذائية" },
+            // الألبان والأجبان
+            { id: 10, name: "جبنة بلدية", price: 9.00, cat: "ألبان" },
+            { id: 11, name: "لبنة شامية", price: 4.50, cat: "ألبان" },
+            { id: 12, name: "حلاوة طحينية", price: 5.50, cat: "ألبان" },
+            { id: 13, name: "قشطة بلدية", price: 3.50, cat: "ألبان" },
+            // المنظفات
+            { id: 20, name: "أريال 2.5 كغ", price: 11.00, cat: "منظفات" },
+            { id: 21, name: "سائل جلي فيري", price: 2.80, cat: "منظفات" },
+            { id: 22, name: "كلور جيل", price: 1.50, cat: "منظفات" },
+            { id: 23, name: "منعم ملابس", price: 4.00, cat: "منظفات" },
+            // معلبات وبقوليات
+            { id: 30, name: "فول مدمس", price: 1.20, cat: "معلبات" },
+            { id: 31, name: "حمص بالطحينة", price: 1.50, cat: "معلبات" },
+            { id: 32, name: "طحينة 400 غ", price: 4.80, cat: "معلبات" },
+            { id: 33, name: "دبس رمان", price: 3.50, cat: "معلبات" },
+            { id: 34, name: "صلصة طماطم", price: 2.00, cat: "معلبات" }
         ];
 
         let cart = [];
         let filteredProducts = [...allProducts];
+
+        function renderCategories() {
+            const cats = ['الكل', ...new Set(allProducts.map(p => p.cat))];
+            document.getElementById('categories-bar').innerHTML = cats.map(c => 
+                `<button onclick="filterCat('${c}')" class="category-pill ${c==='الكل'?'active':''} px-6 py-2 rounded-xl text-sm font-bold whitespace-nowrap border border-gray-700 transition-all">${c}</button>`
+            ).join('');
+        }
 
         function renderProducts() {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = filteredProducts.map(p => {
                 const item = cart.find(x => x.id === p.id);
                 return `
-                <div class="product-card glass p-4 rounded-[2rem] flex items-center justify-between">
-                    <div class="flex-1">
-                        <span class="text-[10px] text-green-500 font-bold uppercase tracking-wider">${p.cat}</span>
-                        <h3 class="font-bold text-lg text-white mb-1">${p.name}</h3>
-                        <p class="text-2xl font-black text-white">${p.price.toFixed(2)} <span class="text-sm text-green-500">€</span></p>
+                <div class="glass p-4 rounded-[2rem] flex items-center justify-between">
+                    <div>
+                        <span class="text-[9px] text-green-500 font-bold uppercase tracking-widest">${p.cat}</span>
+                        <h3 class="font-bold text-white">${p.name}</h3>
+                        <p class="text-xl font-black text-white">${p.price.toFixed(2)} €</p>
                     </div>
                     <div class="flex items-center gap-3 bg-gray-900/50 p-2 rounded-2xl border border-gray-700">
                         ${item ? `
-                            <button onclick="updateQty(${p.id}, -1)" class="w-10 h-10 rounded-xl bg-gray-800 text-red-400"><i class="fas fa-minus"></i></button>
-                            <span class="font-black text-lg w-6 text-center">${item.qty}</span>
+                            <button onclick="updateQty(${p.id},-1)" class="w-8 h-8 rounded-lg bg-gray-800 text-red-400 font-black">-</button>
+                            <span class="font-black text-sm w-4 text-center">${item.qty}</span>
                         ` : ''}
-                        <button onclick="updateQty(${p.id}, 1)" class="w-10 h-10 rounded-xl bg-green-500 text-white shadow-lg shadow-green-500/20"><i class="fas fa-plus"></i></button>
+                        <button onclick="updateQty(${p.id},1)" class="w-10 h-10 rounded-xl bg-green-500 text-white shadow-lg"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>`;
             }).join('');
         }
 
         function updateQty(id, change) {
-            const index = cart.findIndex(x => x.id === id);
-            if (index > -1) {
-                cart[index].qty += change;
-                if (cart[index].qty <= 0) cart.splice(index, 1);
+            const idx = cart.findIndex(x => x.id === id);
+            if (idx > -1) {
+                cart[idx].qty += change;
+                if (cart[idx].qty <= 0) cart.splice(idx, 1);
             } else if (change > 0) {
                 cart.push({...allProducts.find(p => p.id === id), qty: 1});
             }
@@ -193,101 +153,70 @@
             const total = cart.reduce((s, i) => s + (i.price * i.qty), 0);
             document.getElementById('total-amount').innerText = total.toFixed(2) + " €";
             document.getElementById('modal-total').innerText = total.toFixed(2) + " €";
-            
-            const bar = document.getElementById('cart-bar');
-            bar.style.transform = cart.length > 0 ? 'translateY(0)' : 'translateY(150px)';
-            
+            document.getElementById('cart-bar').style.transform = cart.length > 0 ? 'translateY(0)' : 'translateY(150px)';
             renderProducts();
             renderCartItems();
         }
 
         function renderCartItems() {
-            const container = document.getElementById('cart-items');
-            container.innerHTML = cart.map(i => `
-                <div class="flex justify-between items-center bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
+            document.getElementById('cart-items').innerHTML = cart.map(i => `
+                <div class="flex justify-between items-center bg-gray-800/40 p-4 rounded-2xl border border-gray-700">
                     <div class="flex-1">
-                        <p class="font-bold text-white">${i.name}</p>
-                        <p class="text-xs text-green-500 font-bold">${i.price.toFixed(2)} € × ${i.qty}</p>
+                        <p class="font-bold text-white text-sm">${i.name}</p>
+                        <p class="text-xs text-green-500">${(i.price*i.qty).toFixed(2)} €</p>
                     </div>
                     <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2 bg-black/30 p-1 rounded-lg">
-                            <button onclick="updateQty(${i.id}, -1)" class="w-8 h-8 text-gray-400">-</button>
-                            <span class="font-bold text-sm">${i.qty}</span>
-                            <button onclick="updateQty(${i.id}, 1)" class="w-8 h-8 text-gray-400">+</button>
+                        <div class="flex items-center gap-2 bg-black/40 px-2 py-1 rounded-lg">
+                            <button onclick="updateQty(${i.id},-1)" class="text-gray-400 font-black">-</button>
+                            <span class="text-sm font-bold text-white">${i.qty}</span>
+                            <button onclick="updateQty(${i.id},1)" class="text-gray-400 font-black">+</button>
                         </div>
-                        <button onclick="removeItem(${i.id})" class="text-red-500/50 hover:text-red-500 w-10 h-10 rounded-xl bg-red-500/10"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="removeItem(${i.id})" class="text-red-500 bg-red-500/10 w-8 h-8 rounded-lg"><i class="fas fa-trash-alt"></i></button>
                     </div>
-                </div>
-            `).join('');
+                </div>`).join('');
         }
 
         function handleSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            filteredProducts = allProducts.filter(p => p.name.toLowerCase().includes(query));
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            filteredProducts = allProducts.filter(p => p.name.toLowerCase().includes(q));
             renderProducts();
         }
 
         function filterCat(cat) {
-            document.querySelectorAll('.category-pill').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.category-pill').forEach(b => b.classList.toggle('active', b.innerText === cat));
             filteredProducts = cat === 'الكل' ? [...allProducts] : allProducts.filter(p => p.cat === cat);
             renderProducts();
         }
 
-        function toggleModal(id, show) {
-            document.getElementById(id).classList.toggle('hidden', !show);
-        }
-
-        function openCheckout() {
-            toggleModal('cart-modal', false);
-            toggleModal('checkout-modal', true);
-        }
+        function toggleModal(id, show) { document.getElementById(id).classList.toggle('hidden', !show); }
+        function openCheckout() { toggleModal('cart-modal', false); toggleModal('checkout-modal', true); }
 
         async function sendToTelegram() {
-            const name = document.getElementById('u-name').value;
-            const phone = document.getElementById('u-phone').value;
-            const addr = document.getElementById('u-addr').value;
+            const n = document.getElementById('u-name').value;
+            const p = document.getElementById('u-phone').value;
+            const a = document.getElementById('u-addr').value;
+            if(!n || !p) return alert("يرجى إدخال بياناتك");
+
+            let msg = `🛒 طلب جديد - سفير الشام\n━━━━━━━━━━━━━━\nالاسم: ${n}\nالهاتف: ${p}\nالعنوان: ${a}\n━━━━━━━━━━━━━━\n`;
+            cart.forEach(i => msg += `• ${i.name} (x${i.qty})\n`);
+            msg += `━━━━━━━━━━━━━━\nالمجموع: ${document.getElementById('total-amount').innerText}`;
+
             const btn = document.getElementById('final-send');
-
-            if(!name || !phone) return alert("يرجى تعبئة البيانات الأساسية");
-
-            btn.disabled = true;
-            btn.innerHTML = "جاري المعالجة...";
-
-            let text = "🚀 طلب جديد: سفير الشام\n";
-            text += "━━━━━━━━━━━━━━━\n";
-            text += `👤 العميل: ${name}\n`;
-            text += `📞 الهاتف: ${phone}\n`;
-            text += `📍 العنوان: ${addr}\n`;
-            text += "━━━━━━━━━━━━━━━\n";
-            cart.forEach(i => {
-                text += `• ${i.name} (x${i.qty})\n`;
-            });
-            text += "━━━━━━━━━━━━━━━\n";
-            text += `💰 الإجمالي: ${document.getElementById('total-amount').innerText}`;
+            btn.disabled = true; btn.innerText = "جاري الإرسال...";
 
             try {
                 const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ chat_id: CHAT_ID, text: text })
+                    body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
                 });
-
-                if(res.ok) {
-                    alert("✅ تم استلام طلبك، شكراً لك!");
-                    cart = [];
-                    window.location.reload();
-                } else {
-                    alert("❌ حدث خطأ، تأكد من تشغيل البوت أولاً");
-                }
-            } catch (e) {
-                alert("🌐 خطأ في الاتصال");
-            } finally {
-                btn.disabled = false;
-            }
+                if(res.ok) { alert("✅ تم إرسال طلبك بنجاح!"); window.location.reload(); }
+                else alert("❌ فشل الإرسال");
+            } catch(e) { alert("🌐 خطأ اتصال"); }
+            finally { btn.disabled = false; btn.innerText = "إرسال عبر تلغرام"; }
         }
 
-        // Initialize
+        renderCategories();
         renderProducts();
     </script>
 </body>
